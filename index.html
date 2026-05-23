@@ -38,8 +38,6 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(0, 255, 240, 0.5);
         }
-        
-        /* TOALLÍN HECHO CON CÓDIGO (NUNCA FALLA) */
         #target {
             position: absolute;
             width: 70px;
@@ -51,7 +49,6 @@
             cursor: pointer;
             display: none;
         }
-        /* Ojos de Toallín */
         #target::before {
             content: '👀';
             position: absolute;
@@ -59,7 +56,6 @@
             left: 15px;
             font-size: 24px;
         }
-        /* Boca de Toallín */
         #target::after {
             content: '💵';
             position: absolute;
@@ -67,7 +63,6 @@
             left: 20px;
             font-size: 22px;
         }
-
         #start-btn {
             padding: 15px 35px;
             font-size: 20px;
@@ -95,3 +90,103 @@
             color: #ffea00;
             font-size: 16px;
             margin-top: 15px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <h1>💵 ¡Atrapa a Toallín! 💵</h1>
+        <p style="margin: 5px 0;">¡Toca la toalla con ojos antes de que escape!</p>
+        <div class="stats">💰 Billetes: <span id="score">0</span> | ⏱️ <span id="timer">30</span>s</div>
+    </div>
+
+    <div id="game-container">
+        <div id="target"></div>
+        <div id="victory-screen">
+            <h1 style="color: #00fff0; font-size: 32px;">¡TIEMPO TERMINADO!</h1>
+            <p style="font-size: 20px; margin: 5px 0;">Recolectaste:</p>
+            <h2 id="final-score" style="font-size: 54px; margin: 10px 0; color: #ffea00;">$0</h2>
+            <p class="screenshot-alert">📸 ¡Saca CAPTURA DE PANTALLA y envíala al grupo de WhatsApp! 📸</p>
+            <button onclick="resetGame()" style="padding: 12px 25px; background: #00fff0; color: black; border-radius: 25px; border: none; font-weight: bold; font-size: 16px;">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <button id="start-btn" onclick="startGame()">¡EMPEZAR DESAFÍO!</button>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let countdownInterval;
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const target = document.getElementById('target');
+        const startBtn = document.getElementById('start-btn');
+        const container = document.getElementById('game-container');
+        const victoryScreen = document.getElementById('victory-screen');
+        const finalScoreDisplay = document.getElementById('final-score');
+
+        function moveTarget() {
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            
+            const maxX = containerWidth - 80;
+            const maxY = containerHeight - 110;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        target.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            score++;
+            scoreDisplay.textContent = score;
+            moveTarget();
+        });
+
+        target.addEventListener('mousedown', () => {
+            score++;
+            scoreDisplay.textContent = score;
+            moveTarget();
+        });
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = timeLeft;
+            startBtn.style.display = 'none';
+            victoryScreen.style.display = 'none';
+            target.style.display = 'block';
+            
+            moveTarget();
+            gameInterval = setInterval(moveTarget, 850); 
+            
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) { endGame(); }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(countdownInterval);
+            target.style.display = 'none';
+            victoryScreen.style.display = 'flex';
+            finalScoreDisplay.textContent = "$" + score;
+        }
+
+        function resetGame() {
+            victoryScreen.style.display = 'none';
+            startBtn.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
